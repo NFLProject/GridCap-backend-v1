@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: gridcap-backend
+    env: python
+    plan: free
+    buildCommand: "pip install -r backend/requirements.txt"
+    startCommand: "cd backend && uvicorn app:app --host 0.0.0.0 --port 8000"
+    envVars:
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: DATABASE_URL
+        value: "sqlite:////var/data/db.sqlite3"
+      - key: JWT_SECRET
+        sync: false
+      - key: FRONTEND_ORIGIN
+        sync: false
+    disk:
+      name: data
+      mountPath: /var/data
+      sizeGB: 1
