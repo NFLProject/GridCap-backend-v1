@@ -13,16 +13,28 @@ from .models import League, Lineup, LineupSlot, Membership, Player, Squad, Squad
 from .seed_players import seed_players
 
 app = FastAPI(title="GridCap API", openapi_url="/api/openapi.json", docs_url="/api/docs")
+# ---- CORS SETUP (paste this right after app = FastAPI(...)) ----
+import os
+from fastapi.middleware.cors import CORSMiddleware
 
-FRONTEND_ORIGIN = os.getenv("FRONTEND_ORIGIN", "http://localhost:3000")
+# Set this to your deployed Vercel front-end URL
+# e.g. https://grid-cap-frontend-v1-nzmg.vercel.app
+FRONTEND_ORIGIN = os.getenv("FRONTEND_ORIGIN", "")
 
+# If you want to allow all vercel.app subdomains + local dev:
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[FRONTEND_ORIGIN, "http://localhost:3000"],
+    # If you want a single exact origin, use `allow_origins=[FRONTEND_ORIGIN, "http://localhost:3000"]`
+    # To allow *.vercel.app previews too, use regex:
+    allow_origin_regex=r"https://.*\.vercel\.app$",
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"],
+    allow_headers=["*"],  # includes Authorization, Content-Type
 )
+
+# You can still export FRONTEND_ORIGIN in your hosting env; the regex above
+# will allow Vercel previews and the exact origin will also be valid.
+
 
 Base.metadata.create_all(bind=engine)
 
